@@ -390,9 +390,29 @@ int rbt::recover(node* &root)
     {
       return 0;
     }
-  if(root == root1) //if only 1 element in the tree
+  if(root == root1) //if no children, just a left node, just a right node
     {
-      root1 = NULL; //make NULL
+      if(root1->left == NULL) //if the head's left child doesn't exist
+	{
+	  root1 = root->right; //set head to the right
+	  if(root1 != NULL) //if head exists
+	    {
+	      root1->parent = NULL; //set head's parent to NULL
+	      setColor(root1, 0); //set head to black
+	    }
+	  delete root;
+	}
+      else //if right child doesn't exist
+	{
+	  root1 = root->left; //head becomes root->left
+	  if(root1 != NULL) //if head exists
+	    {
+	      root1->parent = NULL; //set head's parent to NULL
+	      setColor(root1, 0); //set head to black
+	    }
+	  delete root;
+	}
+      root = NULL; //make NULL
       return 1;
     }
   
