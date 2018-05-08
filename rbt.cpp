@@ -431,8 +431,8 @@ int rbt::recover(node* &root)
     }
   else //double black cases
     {
-      node* sib = nullptr; //sibling
-      node* p = nullptr; //parent
+      node* sib = NULL; //sibling
+      node* p = NULL; //parent
       node* temp = root; //temp ptr for root
       
       setColor(temp, 2); //sets temp color to 2 - Double Black
