@@ -30,7 +30,7 @@ int main()
   //Purpose: display the tree created in Phase 1
   cout << "Tree successfully generated!\n Your Red-Black Tree:\n";
   tree.display();
-  //  tree.level();
+  tree.level();
 
   //Phase 3:
   //Purpose: prompt user to make additional edits (removing nodes, inserting nodes, re-displaying the tree)
@@ -57,7 +57,7 @@ int main()
 	{
 	  cout << endl;
 	  tree.display(); //displays numbers inorder
-	  //	  tree.level(); //displays visual tree levels
+	  tree.level(); //displays visual tree levels
 	}
       else if(strcmp(readChoice, "DELETE") == 0)
 	{

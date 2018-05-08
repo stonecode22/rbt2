@@ -352,39 +352,38 @@ int rbt::setColor(node* &root, int c)
 node* rbt::inorderTraverse(node* &root)
 {
   node* temp = root;
-  while(temp->left != NULL)
+  while(temp->left != NULL) //traverses while temp->left exists
     {
       temp = temp->left;
     }
-  return temp;
+  return temp; //return the "temp" node
 }
 
 //Finds the node to remove
 node* rbt::findRemove(node* &root, int data)
 {
-  if(root == NULL)
+  if(root == NULL) //if node doesn't exist
     {
-      return root;
+      return root; //return NULL (root)
     }
-  if(data < root->data)
+  if(data < root->data) //if (searching) data is smaller than the data of the node
     {
       return findRemove(root->left, data);
     }
-  if(data > root->data)
+  if(data > root->data) //if (searching) data is larger than node data
     {
       return findRemove(root->right, data);
     }
-  if(root->left == NULL || root->right == NULL)
+  if(root->left == NULL || root->right == NULL) //if a child is NULL
     {
       return root;
     }
-  node* temp = inorderTraverse(root->right);
-  root->data = temp->data;
+  node* temp = inorderTraverse(root->right); //temp = successor node
+  root->data = temp->data; //match data between root and temp
   return findRemove(root->right, temp->data);
 }
 
-
-/*
+//Corrects the RB Tree after deletion
 int rbt::recover(node* &root)
 {
   if(root == NULL) //if no tree
@@ -397,10 +396,10 @@ int rbt::recover(node* &root)
       return 1;
     }
   
-  if(getColor(root) == 1 || getColor(root->left) == 1 || getColor(root->right) == 1) //if node is red/leftchild is red/rightchild is red
+  if(getColor(root) == 1 || getColor(root->left) == 1 || getColor(root->right) == 1) //if node is red/left child is red/right child is red
     {
-      cout << "RED Recover\n";
       node* child = NULL;
+
       if(root->left != NULL) //if left child exists
 	{
 	  child = root->left; //make child point to left child
@@ -412,264 +411,136 @@ int rbt::recover(node* &root)
       if(root == root->parent->left) //if "root" is parent's left child
 	{
 	  root->parent->left = child; //link the parent's left child to "root's" child (root should be unconnected from tree)
-	  if(child != NULL) //if child exists
+	  if(child != nullptr) //if child exists
 	    {
 	      child->parent = root->parent; //link child and root's parent
 	    }
 	  setColor(child, 0); //make the child black
 	  delete root;
-	  return 1;
 	} 
       else //root is parent's right child
 	{
 	  root->parent->right = child; //parent's right child becomes root's child
-	  if(child != NULL) //if child exists
+	  if(child != nullptr) //if child exists
 	    {
 	      child->parent = root->parent; //link child to root's parent
 	    }
 	  setColor(child, 0); //set child to black
-	  delete root; //CORE DUMP HERE
-	  return 1;
+	  delete root;
 	}
     }
-  else //double black
+  else //double black cases
     {
-      cout << "DOUBLEBLACK Recover\n";
-      node* sib = NULL;
-      node* p = NULL;
-      node* temp = root;
+      node* sib = nullptr; //sibling
+      node* p = nullptr; //parent
+      node* temp = root; //temp ptr for root
       
-      setColor(temp, 2);
-      while(temp != root1 && getColor(temp) == 2)
+      setColor(temp, 2); //sets temp color to 2 - Double Black
+      while(temp != root1 && getColor(temp) == 2) //while temp isn't head of tree and temp is dbl black
 	{
-	  p = temp->parent;
-	  if(temp == p->left)
+	  p = temp->parent; //parent assigned parent of temp
+	  if(temp == p->left) //if temp is left child of parent
 	    {
-	      sib = p->right;
+	      sib = p->right; //sibling is then the right
 	      if(getColor(sib) == 1) //if sibling is red
 		{
-		  setColor(sib, 0);
-		  setColor(p, 1);
-		  rotateL(p);
+		  setColor(sib, 0); //set sibling to black
+		  setColor(p, 1); //set parent to red
+		  rotateL(p); //left rotate
 		}
 	      else //if sibling is black, sib's children are black
 		{
 		  if(getColor(sib->left) == 0 && getColor(sib->right) == 0)
 		    {
-		      setColor(sib, 1);
-		      if(getColor(p) == 1)
+		      setColor(sib, 1); //set sibling to red
+		      if(getColor(p) == 1) //if parent is red
 			{
-			  setColor(p, 0);
+			  setColor(p, 0); //set parent to black (recover from dbl black)
 			}
 		      else
 			{
-			  setColor(p, 2);
+			  setColor(p, 2); //set parent to dbl black (transfer dbl black)
 			}
-		      temp = p;
+		      temp = p; //temp = parent
 		    }
 		  else //no double black siblings
 		    {
-		      if(getColor(sib->right) == 0)
+		      if(getColor(sib->right) == 0) //if sibling's right child is black
 			{
-			  setColor(sib->left, 0);
-			  setColor(sib, 1);
-			  rotateR(sib);
-			  sib = p->right;
+			  setColor(sib->left, 0); //set sibling's left child to black
+			  setColor(sib, 1); //set sibling to red
+			  rotateR(sib); //rotate right
+			  sib = p->right; //sibling is now parent's right child
 			}
-		      setColor(sib, p->color);
-		      setColor(p, 0);
-		      setColor(sib->right, 0);
-		      rotateL(p);
-		      break; //terminate
+		      setColor(sib, p->color); //set sibling's color = parent's color
+		      setColor(p, 0); //set parent to black
+		      setColor(sib->right, 0); //set sibling's right child to black
+		      rotateL(p); //rotate left
+		      break; //break out of the loop
 		    }
 		}			  
 	    }
-	  else
+	  else //if temp is right child of parent
 	    {
-	      sib = p->left;
-	      if(getColor(sib) == 1)
+	      sib = p->left; //then sibling is parent's left child
+	      if(getColor(sib) == 1) //if sibling is red
 		{
-		  setColor(sib, 0);
-		  setColor(p, 1);
-		  rotateR(p);
+		  setColor(sib, 0); //set sibling to black
+		  setColor(p, 1); //set parent to red
+		  rotateR(p); //rotate right
 		}
-	      else
+	      else //if sibling is black
 		{
-		  if(getColor(sib->left) == 0 && getColor(sib->right) == 0)
+		  if(getColor(sib->left) == 0 && getColor(sib->right) == 0) //and children are black
 		    {
-		      setColor(sib, 1);
-		      if(getColor(p) == 1)
+		      setColor(sib, 1); //set sibling to red
+		      if(getColor(p) == 1) //if parent is red
 			{
-			  setColor(p, 0);
+			  setColor(p, 0); //set parent to black (recover from dbl black)
 			}
-		      else
+		      else //if black
 			{
-			  setColor(p, 2);
+			  setColor(p, 2); //set parent to dbl black (transfer dbl black)
 			}
-		      temp = p;
+		      temp = p; //temp = parent
 		    }
-		  else
+		  else //if children are not black
 		    {
-		      if(getColor(sib->left) == 0)
+		      if(getColor(sib->left) == 0) //if sibling's left child is black
 			{
-			  setColor(sib->right, 0);
-			  setColor(sib, 1);
-			  rotateL(sib);
-			  sib = p->left;
+			  setColor(sib->right, 0); //set sibling's right child is black
+			  setColor(sib, 1); //set sibling to red
+			  rotateL(sib); //rotate left
+			  sib = p->left; //sibling is parent's left child
 			}
-		      setColor(sib, p->color);
-		      setColor(p, 0);
-		      setColor(sib->left, 0);
-		      rotateR(p);
-		      break;
+		      setColor(sib, p->color); //sibling's color = parent's color now
+		      setColor(p, 0); //set parent to black
+		      setColor(sib->left, 0); //set sibling's left child to black
+		      rotateR(p); //rotate right
+		      break; //terminate, break out of the loop
 		    }
 		}
 	    }
-	}
-      if(root == root->parent->left)
+	} //while loop ends
+      if(root == root->parent->left) //if the root is the left child of its parent 
 	{
-	  root->parent->left = NULL;
+	  root->parent->left = NULL; //set NULL
 	}
-      else
+      else //if right child
 	{
-	  root->parent->right = NULL;
+	  root->parent->right = NULL; //set NULL
 	}
-      delete temp;
-      setColor(root1, 0);
+      delete root;
+      setColor(root1, 0); //set the head of tree to black
       return 1;
     }
 }
-*/
 
-void rbt::recover(node *&temp) {
-        if (temp == NULL)
-                return;
-
-        if (temp == root1) {
-                root1 = NULL;
-                return;
-        }
-        //If any is red then easy fix
-        if (getColor(temp) == 1 || getColor(temp->left) == 1|| getColor(temp->right) == 1) {
-          cout << "RedRecover\n";
-                node *child = temp->left != NULL ? temp->left : temp->right;
-
-                //If temp is left child of gp
-                if (temp == temp->parent->left) {
-                        //Connect temp's child
-                        temp->parent->left = child;
-                        if (child != nullptr)
-                                child->parent = temp->parent;
-                                //reconnect if not NULL
-                        setColor(child, 0);
-                        delete (temp);
-                }
-                else {
-                        //temp is right child of gp
-                        temp->parent->right = child;
-                        if (child != nullptr)
-                                child->parent = temp->parent;
-                                //reconnect if not null
-                        setColor(child, 0);
-                        delete (temp);
-                }
-        }
-        //double black
- else {
-                node *sibling = nullptr;
-                node *parent = nullptr;
-                node *ptr = temp;
-                cout << "DoubleBlack\n";
-                setColor(ptr, 2);
-                //Do if we are not root and color is double black
-                while (ptr != root && getColor(ptr) == 2) {
-                        parent = ptr->parent;
-                        //if we are left child of parent
-                        if (ptr == parent->left) {
-                                //sibling is on right side
-                                sibling = parent->right;
-                                //one of the cases
-                                if (getColor(sibling) == 1) {
-                                        setColor(sibling, 0);
-                                        setColor(parent, 1);
-                                        rotateL(parent);
-                                }
-                                //must be one of another case
-                                else {
-                                        if (getColor(sibling->left) == 0 && getColor(sibling->right) == 0) {
-                                                setColor(sibling, 1);
-                                                if (getColor(parent) == 1)
-                                                        setColor(parent, 0);
-                                                else
-                                                        setColor(parent, 2);
-                                                ptr = parent;
-                                        }
-                                        //terminal case
-                                        else {
-                                                if (getColor(sibling->right) == 0) {
-                                                        setColor(sibling->left, 0);
-                                                        setColor(sibling, 1);
-                                                        rotateR(sibling);
-                                                        sibling = parent->right;
-                                                }
-                                                setColor(sibling, parent->color);
-                                                setColor(parent, 0);
-                                                setColor(sibling->right, 0);
-                                                rotateL(parent);
-
-                                                break;
-                                        }
-                                }
-                        }
-                        //we are right child of parent. almost the same
-               else {
-                                sibling = parent->left;
-                                if (getColor(sibling) == 1) {
-                                        setColor(sibling, 0);
-                                        setColor(parent, 1);
-                                        rightRotate(parent);
-                                }
-                                else {
-                                        if (getColor(sibling->left) == 0 && getColor(sibling->right) == 0) {
-                                                setColor(sibling, 1);
-                                                if (getColor(parent) == 1)
-                                                        setColor(parent, 0);
-                                                else
-                                                        setColor(parent, 2);
-                                                ptr = parent;
-                                        }
-                                        else {
-                                                if (getColor(sibling->left) == 0) {
-                                                        setColor(sibling->right, 0);
-                                                        setColor(sibling, 1);
-                                                        rotateL(sibling);
-                                                        sibling = parent->left;
-                                                }
-                                                setColor(sibling, parent->color);
-                                                setColor(parent, 0);
-                                                setColor(sibling->left, 0);
-                                                rotateR(parent);
-                                                break;
-                                        }
-                                }
-                        }
-                }
-                //done do the disconnect and delete
-		if (temp == temp->parent->left)
-                        temp->parent->left = nullptr;
-                else
-                        temp->parent->right = nullptr;
-                delete(temp);
-                setColor(root1, 0);
-        }
-}
-
-
-//removal function here in pt2
+//removal function
 int rbt::remove(int data)
 {
-  node* temp = findRemove(root1, data);
-  recover(temp);
+  node* temp = findRemove(root1, data); //find matching node (data = root->data)
+  recover(temp); //delete it, and correct to maintain RB Tree
   return 1;
 }
 

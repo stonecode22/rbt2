@@ -41,8 +41,7 @@ class rbt
   int repair(node* &root, node* &temp); //repair on insertion, corrects coloring and placement
   
   //deletion functions
-  void recover(node* &temp);
-  //int recover(node* &root); //repair on deletion, corrects coloring and placement
+  int recover(node* &root); //repair on deletion, corrects coloring and placement
   int removeAll(node* &root); //clear entire tree (for deconstructor)
   node* inorderTraverse(node* &root); //traverses to find the successor of the chosen node, used in findRemove function
   node* findRemove(node* &root, int data);  //finds a node for deletion
